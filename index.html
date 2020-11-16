@@ -349,7 +349,7 @@
         // create the ground plane
         var planeGeometry = new THREE.PlaneGeometry(60, 60);
 
-        var planeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ffff });
+        var planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
         var plane = new THREE.Mesh(planeGeometry, planeMaterial);
         plane.receiveShadow = true;
         plane.material.side = THREE.DoubleSide;
@@ -482,7 +482,7 @@
 
         var curve = new THREE.SplineCurve3(vectorList);
 
-        var geometry = new THREE.TubeGeometry(curve, 5, 1, 300, false);
+        var geometry = new THREE.TubeGeometry(curve, 40, 1, 300, false);
 
         var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
 
@@ -497,11 +497,11 @@
         var maxI = usteps;
         var stepLenght = 10;
         var stepWidth = 10;
-        var stepThickness = 0.1;
+        var stepThickness = (0.2 * 15) / usteps;
         var x, y, z;
         var ry, rx, rz;
         var poleRadius = 0.5;
-        var poleHeight = 1;
+        var poleHeight = 5;
         var radius = uradius;
         var angle = uangle;
 
@@ -564,45 +564,49 @@
           z =
             (radius + stepLenght / 2) *
             Math.cos(((Math.PI * i) / maxI) * angle);
-          var pol = CreatePole(
-            scene,
-            poleRadius,
-            poleHeight,
-            x,
-            y + poleHeight / 2,
-            z
-          );
-          elementList.push(pol);
+          if (i + 2 < maxI) {
+            var pol = CreatePole(
+              scene,
+              poleRadius,
+              poleHeight,
+              x,
+              y + (poleHeight / 2) * 3,
+              z
+            );
+            elementList.push(pol);
 
-          x += (stepLenght / 5) * Math.cos(((Math.PI * i) / maxI) * angle);
-          z -= (stepLenght / 5) * Math.sin(((Math.PI * i) / maxI) * angle);
-          var strr = CreateStairRest(
-            scene,
-            stepLenght / 4,
-            stepWidth / 5,
-            stepThickness + 1,
-            x,
-            y + poleHeight - (stepThickness + 1) / 2,
-            z,
-            rx,
-            ry,
-            rz
-          );
-          elementList.push(strr);
+            x += (stepLenght / 5) * Math.cos(((Math.PI * i) / maxI) * angle);
+            z -= (stepLenght / 5) * Math.sin(((Math.PI * i) / maxI) * angle);
+            var strr = CreateStairRest(
+              scene,
+              stepLenght / 3.25 ,
+              stepWidth / 5,
+              stepThickness + 1,
+              x,
+              y + poleHeight * 2 - (stepThickness + 1) / 2,
+              z,
+              rx,
+              ry,
+              rz
+            );
+            elementList.push(strr);
+          }
 
           x = radius * Math.sin(((Math.PI * i) / maxI) * angle); //(stepWidth / 2)
           z = radius * Math.cos(((Math.PI * i) / maxI) * angle);
           var hpol = CreatePole(
             scene,
             poleRadius,
-            poleHeight * 3,
+            (poleHeight * 3 * usteps) / 15,
             x,
-            y + poleHeight * 1.5,
+            y + (poleHeight * 1.5 * usteps) / 15,
             z
           );
           elementList.push(hpol);
 
-          vectorList.push(new THREE.Vector3(x, y + poleHeight * 3, z));
+          vectorList.push(
+            new THREE.Vector3(x, y + (poleHeight * 3 * usteps) / 15, z)
+          );
         }
 
         var planeWidth = 30;
@@ -611,9 +615,9 @@
         elementList.push(str);
         var plane = CreatePlane(
           scene,
-          x + Math.cos(((Math.PI * i) / maxI) * angle) * planeWidth,
-          y + poleHeight + 0.1,
-          z - Math.sin(((Math.PI * i) / maxI) * angle) * planeWidth,
+          x + Math.cos(((Math.PI * i - 1) / maxI) * angle) * planeWidth,
+          y  + 0.1, //+ poleHeight
+          z - Math.sin(((Math.PI * i - 1) / maxI) * angle) * planeWidth,
           ((Math.PI * i) / maxI) * angle
         );
         elementList.push(plane);
@@ -625,7 +629,7 @@
         var elementList = [];
         var loader = new THREE.TextureLoader();
         loader.load(
-          "https://assets.entrepreneur.com/content/3x2/2000/20200311142553-white-house.jpeg",
+          "https://nerdist.com/wp-content/uploads/2019/10/hogwarts-staircase.jpg",
           function (texture) {
             const rt = new THREE.WebGLCubeRenderTarget(texture.image.height);
             rt.fromEquirectangularTexture(renderer, texture);
@@ -680,8 +684,8 @@
 
         var gui = new dat.GUI();
 
-        gui.add(controls2, "angle", 0, 2).onChange(controls2.redraw);
-        gui.add(controls2, "stepsC", 5, 40).step(1).onChange(controls2.redraw);
+        gui.add(controls2, "angle", 0.3, 3).onChange(controls2.redraw);
+        gui.add(controls2, "stepsC", 5, 100).step(1).onChange(controls2.redraw);
         gui.add(controls2, "radius", 5, 40).step(1).onChange(controls2.redraw);
         controls2.redraw();
 
@@ -692,12 +696,12 @@
 
         // add spotlight for the shadows
         var spotLight = new THREE.SpotLight(0xffffff);
-        spotLight.position.set(40, 60, 20);
+        spotLight.position.set(40, 140, 20);
 
         spotLight.castShadow = true;
         scene.add(spotLight);
 
-        var ambLight = new THREE.AmbientLight(0x400040, 0.1); // soft white light
+        var ambLight = new THREE.AmbientLight(0xffffff, 0.1); // soft white light
         scene.add(ambLight);
 
         // add the output of the renderer to the html element
