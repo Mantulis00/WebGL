@@ -396,13 +396,13 @@
         shape.lineTo(stepLenght, 0);
         shape.lineTo(0, 0);
 
-        const extrudeSettings = {
-          amount: stepThickness,
-          steps: 2,
-          depth: 2,
+        var extrudeSettings = {
+          amount: stepThickness*2,
+          steps: 4,
+          depth: 4,
           bevelEnabled: true,
-          bevelThickness: 0.1,
-          bevelSize: 0.1,
+          bevelThickness: 0.4,
+          bevelSize: 0.4,
           bevelOffset: 0,
           bevelSegments: 5,
         };
@@ -456,7 +456,7 @@
 
       function CreatePole(scene, radius, height, x, y, z) {
         var geometry = new THREE.CylinderGeometry(radius, radius, height, 32);
-        var material = new THREE.MeshPhongMaterial({ color: 0xffffff });
+        var material = new THREE.MeshPhongMaterial({ color: 0xffffff, reflectivity: 1      });
         var cylinder = new THREE.Mesh(geometry, material);
 
         cylinder.position.x = x; //* Math.sin((i / 15) * Math.PI);
@@ -655,11 +655,15 @@
         //var angle = 0.5,
         //   stepsC = 15;
         // Draw(scene, elementList, angle, stepsC);
-
+        var spotLight = new THREE.SpotLight(0xffffff);
+        spotLight.position.set(40, 250, 20);
+        
         var controls2 = new (function () {
           this.angle = 1;
           this.stepsC = 20;
           this.radius = 20;
+
+         
 
           this.redraw = function () {
             elementList.forEach((element) => {
@@ -671,7 +675,7 @@
               stepsC: controls2.stepsC,
               radius: controls2.radius,
             };
-
+            spotLight.rotation.set(controls2.angle, 0, 0)
             Draw(
               scene,
               elementList,
@@ -695,13 +699,13 @@
         camera.lookAt(scene.position);
 
         // add spotlight for the shadows
-        var spotLight = new THREE.SpotLight(0xffffff);
-        spotLight.position.set(40, 140, 20);
+       
+        
 
         spotLight.castShadow = true;
         scene.add(spotLight);
 
-        var ambLight = new THREE.AmbientLight(0xffffff, 0.1); // soft white light
+        var ambLight = new THREE.AmbientLight(0xffffff, 0.4); // soft white light
         scene.add(ambLight);
 
         // add the output of the renderer to the html element
